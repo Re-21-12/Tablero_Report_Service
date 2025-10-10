@@ -39,14 +39,27 @@ def raiz():
 
 
     return jsonify({"mensaje": "API Flask funcionando correctamente"})
-@app.route("/Reporte/Jugadores")
-def prueba():
-    return dt.obtener_token()
+
 
 @app.route("/Reporte/Equipos")
 def Reporte_Equipos():
     global token
     return RG.Generar_Equipos(token)
+@app.route("/Reporte/Jugadores")
+def Reporte_Equipo_Jugadores():
+    global token
+    id_equipo = request.args.get('id')
+    return RG.Generar_Jugadores(token, id_equipo)
+@app.route("/Reporte/Partidos")
+def Reporte_Partidos_Marcador():
+    global token
+    return RG.Generar_Historial_Partidos(token)
+@app.route("/Reporte/Partido/Roster")
+def Reporte_Jugadores_Equipo_Partido():
+    global token
+    id_partido = request.args.get('id')
+    return RG.Generar_Roster_Partido(token, id_partido)
+
 
 @app.route("/usuarios")
 def obtener_usuarios():
