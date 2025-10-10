@@ -2,41 +2,106 @@ import requests
 
 base = "http://localhost:5232"
 
+user = {
+}
 
+def set_user(json):
+    global user
+    user = json
 
 def obtener_token():
-    user = {
-        "nombre": "Macario",
-        "contrasena": "apple123"
-    }
+    global user
 
     try:
         response = requests.post(f"{base}/api/Auth/login", json=user)
 
         if response.status_code == 200:
             data = response.json()
-            token = data.get("token") or data.get("access_token")  # depende del backend
-            print("✅ Token obtenido correctamente")
+            token = data.get("token") or data.get("access_token")  
+            
             return token
         else:
-            print(f"❌ Error al obtener token: {response.status_code}")
-            print(response.text)
+            
             return None
 
     except requests.exceptions.RequestException as e:
-        print(f"⚠️ Error de conexión: {e}")
+        print(f" Error de conexión: {e}")
         return None
     
-token = obtener_token()
 
 
 def Obtener_Jugadores(token):
+    print(token)
     headers = {'Authorization': f'Bearer {token}'}
-    response = requests.get(base+"/api/Jugadores", headers=headers)
+    response = requests.get(base+"/api/Jugador", headers=headers)
+    print("ESta es la request: ")
+    for k, v in response.request.headers.items():
+        print(k + ":", v)
     if response.status_code == 200:
+        print("Si pasa")
         return response.json()
     return {"error": "No se pudo obtener la información"}
-
+def Obtener_Jugadores_Equipo(token, id_equipo):
+    print(token)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(base+f"/api/Jugador/byTeam/{id_equipo}", headers=headers)
+    print("ESta es la request: ")
+    for k, v in response.request.headers.items():
+        print(k + ":", v)
+    if response.status_code == 200:
+        print("Si pasa")
+        return response.json()
+    return {"error": "No se pudo obtener la información"}
+def Obtener_Equipos(token):
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(base+"/api/Equipo", headers=headers)
+    print("ESta es la request: ")
+    for k, v in response.request.headers.items():
+        print(k + ":", v)
+    if response.status_code == 200:
+        print("Si pasa")
+        return response.json()
+    return {"error": "No se pudo obtener la información"}
+def Obtener_Partidos_Marcador(token): #Place Holder, el marcador es manejado por Cuartos, debo ampliar este metodo
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(base+"/api/Partido", headers=headers)
+    print("ESta es la request: ")
+    for k, v in response.request.headers.items():
+        print(k + ":", v)
+    if response.status_code == 200:
+        print("Si pasa")
+        return response.json()
+    return {"error": "No se pudo obtener la información"}
+def Obtener_Jugadores_Partido(token, id_Partido):
+    print(token)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(base+f"/api/Partido/Reporte/{id_Partido}", headers=headers)
+    Partidos_id = response.json()
+    response = requests.get(base+f"/api/Partido/{id_Partido}", headers=headers)
+    Partido_info = response.json()
+    response = response = requests.get(base+f"/api/Jugador/byTeam/{Partidos_id["local"]}", headers=headers)
+    Jugadores_locales = response.json()
+    response = response = requests.get(base+f"/api/Jugador/byTeam/{Partidos_id["visitante"]}", headers=headers)
+    jugadores_visitantes = response.json()
+    
+    print("ESta es la request: ")
+    for k, v in response.request.headers.items():
+        print(k + ":", v)
+    if response.status_code == 200:
+        print("Si pasa")
+        return Partido_info, Jugadores_locales, jugadores_visitantes
+    return {"error": "No se pudo obtener la información"}
+def Obtener_Estadisticas_Jugador(token, id_Jugador):
+    print(token)
+    headers = {'Authorization': f'Bearer {token}'}
+    response = response = requests.get(base+f"/api/Jugador/{id_Jugador}", headers=headers)
+    datos_jugador = response.json()
+    response = requests.get(base+f"/api/Faltas/jugador/{id_Jugador}", headers=headers)
+    total_faltas = response.json()
+    response = requests.get(base+f"/api/Anotaciones/jugador/{id_Jugador}", headers=headers)
+    total_anotaciones = response.json()
+    return datos_jugador, total_faltas, total_anotaciones
+ 
 
 def obtener_usuarios(token):
     headers = {
