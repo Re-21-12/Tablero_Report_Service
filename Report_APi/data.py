@@ -84,13 +84,7 @@ def Obtener_Jugadores_Partido(token, id_Partido):
     response = response = requests.get(base+f"/api/Jugador/byTeam/{Partidos_id["visitante"]}", headers=headers)
     jugadores_visitantes = response.json()
     
-    print("ESta es la request: ")
-    for k, v in response.request.headers.items():
-        print(k + ":", v)
-    if response.status_code == 200:
-        print("Si pasa")
-        return Partido_info, Jugadores_locales, jugadores_visitantes
-    return {"error": "No se pudo obtener la información"}
+    return Partido_info, Jugadores_locales, jugadores_visitantes
 def Obtener_Estadisticas_Jugador(token, id_Jugador):
     print(token)
     headers = {'Authorization': f'Bearer {token}'}

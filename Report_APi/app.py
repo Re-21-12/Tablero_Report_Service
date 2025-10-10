@@ -1,7 +1,7 @@
 import requests
 from flask import Flask, jsonify, request
 from database import db
-from data import obtener_token, Obtener_Jugadores
+import data as dt
 import ReportGenerator as RG
 
 app = Flask(__name__)
@@ -9,10 +9,7 @@ token = ""
 
 @app.route("/")
 def default():
-    return jsonify({"Mensaje": "Esta ruta es la principal, no hay nada aqui"})
-
-@app.route("/auth", methods=["GET"])
-def raiz():
+    """
     global token
     r = request.get_json()
     usuario = {
@@ -20,14 +17,36 @@ def raiz():
         "contrasena": r["contrasena"]
     }
     token = obtener_token(usuario)
+    """
+    return jsonify({"mensaje": "API Flask funcionando correctamente"})
+    
+
+@app.route("/auth", methods=["GET"])
+def raiz():
+    global token
+    """r = request.get_json()
+    usuario = {
+        "nombre": r["nombre"],
+        "contrasena": r["contrasena"]
+    }
+    """
+    usuario = {
+        "nombre": "Macario",
+        "contrasena": "apple123"
+    }
+    dt.set_user(usuario)
+    token = dt.obtener_token()
+
+
     return jsonify({"mensaje": "API Flask funcionando correctamente"})
 @app.route("/Reporte/Jugadores")
 def prueba():
-    return obtener_token()
+    return dt.obtener_token()
 
 @app.route("/Reporte/Equipos")
 def Reporte_Equipos():
-    return RG.Generar_Equipos()
+    global token
+    return RG.Generar_Equipos(token)
 
 @app.route("/usuarios")
 def obtener_usuarios():
@@ -36,8 +55,8 @@ def obtener_usuarios():
 
 @app.route("/externa")
 def consumir_externa():
-    token = obtener_token()
-    data = Obtener_Jugadores(token)
+    token = dt.obtener_token()
+    data = dt.Obtener_Jugadores(token)
     return jsonify({"datos": data})
 
 if __name__ == "__main__":
