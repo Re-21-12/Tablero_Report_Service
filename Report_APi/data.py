@@ -128,7 +128,7 @@ def Obtener_Estadisticas_Jugador(token, id_Jugador):
     datos_jugador = response.json()
     response = requests.get(base+f"/api/Faltas/jugador/{id_Jugador}", headers=headers)
     total_faltas = response.json()
-    response = requests.get(base+f"/api/Anotaciones/jugador/{id_Jugador}", headers=headers)
+    response = requests.get(base+f"/api/Anotacion/jugador/{id_Jugador}", headers=headers)
     total_anotaciones = response.json()
     return datos_jugador, total_faltas, total_anotaciones
  

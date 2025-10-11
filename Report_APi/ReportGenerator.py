@@ -364,3 +364,106 @@ def Generar_Roster_Partido_delado(token, id_partido):
         from flask import jsonify
         return jsonify({"error": str(e)}), 500
 
+
+def Generar_Reporte_Estadisticas_Jugador(token, id_jugador):
+    try:
+        # Obtener los datos desde tu método existente
+        jugador, total_faltas, total_anotaciones = dt.Obtener_Estadisticas_Jugador(token, id_jugador)
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        elements = []
+        styles = getSampleStyleSheet()
+
+        # Encabezado corporativo
+        encabezado_pdf(elements, styles, f"Estadísticas del Jugador: {jugador.get('nombre', '')} {jugador.get('apellido', '')}")
+
+        elements.append(Spacer(1, 12))
+
+        # Información del jugador
+        info_texto = f"Jugador: {jugador.get('nombre', '')} {jugador.get('apellido', '')}"
+        elements.append(Paragraph(info_texto, styles["Heading2"]))
+        elements.append(Spacer(1, 12))
+
+        # Tabla de Faltas
+        if total_faltas:
+            data_faltas = [["ID Partido", "Total Faltas"]]
+            total_faltas_count = 0
+            for f in total_faltas:
+                data_faltas.append([
+                    f.get("id_Partido", "N/D"),
+                    f.get("total_faltas", 0)
+                ])
+                total_faltas_count += f.get("total_faltas", 0)
+            elements.append(Paragraph("Faltas", styles["Heading3"]))
+            table_faltas = Table(data_faltas, colWidths=[100, 100])
+            table_faltas.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('INNERGRID', (0,0), (-1,-1), 0.25, colors.gray),
+                ('BOX', (0,0), (-1,-1), 0.25, colors.gray),
+                ('BACKGROUND', (0,1), (-1,-1), colors.HexColor("#F9F9F9")),
+            ]))
+            elements.append(table_faltas)
+            elements.append(Spacer(1, 12))
+        else:
+            total_faltas_count = 0
+
+        # Tabla de Anotaciones
+        if total_anotaciones:
+            data_anot = [["ID Partido", "Total Anotaciones"]]
+            total_anot_count = 0
+            for a in total_anotaciones:
+                data_anot.append([
+                    a.get("id_partido", "N/D"),
+                    a.get("total_anotaciones", 0)
+                ])
+                total_anot_count += a.get("total_anotaciones", 0)
+            elements.append(Paragraph("Anotaciones", styles["Heading3"]))
+            table_anot = Table(data_anot, colWidths=[100, 100])
+            table_anot.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('INNERGRID', (0,0), (-1,-1), 0.25, colors.gray),
+                ('BOX', (0,0), (-1,-1), 0.25, colors.gray),
+                ('BACKGROUND', (0,1), (-1,-1), colors.HexColor("#F9F9F9")),
+            ]))
+            elements.append(table_anot)
+            elements.append(Spacer(1, 12))
+        else:
+            total_anot_count = 0
+
+        # Tabla resumen final
+        data_resumen = [["Total Faltas", "Total Anotaciones"]]
+        data_resumen.append([total_faltas_count, total_anot_count])
+        elements.append(Paragraph("Resumen General", styles["Heading3"]))
+        table_resumen = Table(data_resumen, colWidths=[120, 120])
+        table_resumen.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.gray),
+            ('BOX', (0,0), (-1,-1), 0.25, colors.gray),
+            ('BACKGROUND', (0,1), (-1,-1), colors.HexColor("#F9F9F9")),
+        ]))
+        elements.append(table_resumen)
+        elements.append(Spacer(1, 12))
+
+        # Generar PDF
+        doc.build(elements)
+        buffer.seek(0)
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=f"estadisticas_jugador_{jugador.get('nombre', '')}_{jugador.get('apellido', '')}.pdf",
+            mimetype="application/pdf"
+        )
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+

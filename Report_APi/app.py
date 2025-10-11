@@ -59,7 +59,11 @@ def Reporte_Jugadores_Equipo_Partido():
     global token
     id_partido = request.args.get('id')
     return RG.Generar_Roster_Partido(token, id_partido)
-
+@app.route("/Reporte/Estadistica/Jugador")
+def Reporte_Estadistica_Jugador():
+    global token
+    id_jugador = request.args.get('id')
+    return RG.Generar_Reporte_Estadisticas_Jugador(token, id_jugador)
 
 @app.route("/usuarios")
 def obtener_usuarios():
