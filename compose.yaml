@@ -1,18 +1,31 @@
+version: "3.9"
+
 services:
+  app:
+    build: ./Report_APi
+    container_name: reportes-app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - MONGO_URI=mongodb://root:apple123@mongo:27017/
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+
   mongo:
-    image: mongo
+    image: mongo:6
+    container_name: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: apple123
-
-  mongo-express:
-    image: mongo-express
-    restart: always
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_URL: mongodb://root:apple123@mongo:27017/
-      ME_CONFIG_BASICAUTH_ENABLED: true
-      ME_CONFIG_BASICAUTH_USERNAME: dajokaem
-      ME_CONFIG_BASICAUTH_PASSWORD: apple123
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
