@@ -451,10 +451,10 @@ def Generar_Roster_Partido_delado(token, id_partido):
         return jsonify({"error": str(e)}), 500
 
 
-def Generar_Reporte_Estadisticas_Jugador(token, id_jugador):
+def Generar_Reporte_Estadisticas_Jugador(datos):
     try:
         # Obtener los datos desde tu método existente
-        jugador, total_faltas, total_anotaciones = dt.Obtener_Estadisticas_Jugador(token, id_jugador)
+        jugador, total_faltas, total_anotaciones = datos["jugador"], datos["total_faltas"], datos["total_anotaciones"]
 
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4)
@@ -462,12 +462,12 @@ def Generar_Reporte_Estadisticas_Jugador(token, id_jugador):
         styles = getSampleStyleSheet()
 
         # Encabezado corporativo
-        encabezado_pdf(elements, styles, f"Estadísticas del Jugador: {jugador.get('nombre', '')} {jugador.get('apellido', '')}")
+        encabezado_pdf(elements, styles, f"Estadísticas del Jugador: {jugador.get('Nombre', '')} {jugador.get('Apellido', '')}")
 
         elements.append(Spacer(1, 12))
 
         # Información del jugador
-        info_texto = f"Jugador: {jugador.get('nombre', '')} {jugador.get('apellido', '')}"
+        info_texto = f"Jugador: {jugador.get('Nombre', '')} {jugador.get('Apellido', '')}"
         elements.append(Paragraph(info_texto, styles["Heading2"]))
         elements.append(Spacer(1, 12))
 
@@ -542,20 +542,9 @@ def Generar_Reporte_Estadisticas_Jugador(token, id_jugador):
 
         # Generar PDF
         doc.build(elements)
-        db = bnb.get_mongo_connection()
+        
 
-
-        buffer.seek(0)
-        pdf_bytes = buffer.read()
-
-        documento = {
-            "nombre_reporte": "Reporte de Equipos Registrados",
-            "tipo": "equipos",
-            "fecha_creacion": datetime.utcnow(),
-            "archivo_pdf": Binary(pdf_bytes)
-        }
-
-        db.Reporteria.insert_one(documento)
+       
         buffer.seek(0)
         return send_file(
             buffer,
