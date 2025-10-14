@@ -41,28 +41,33 @@ def raiz():
     return jsonify({"mensaje": "API Flask funcionando correctamente"})
 
 
-@app.route("/Reporte/Equipos")
+@app.route("/Reporte/Equipos", methods=["POST"])
 def Reporte_Equipos():
     global token
-    return RG.Generar_Equipos(token)
-@app.route("/Reporte/Jugadores")
+    data = request.get_json()
+    print(data)
+    return RG.Generar_Equipos(data)
+@app.route("/Reporte/Jugadores", methods=["POST"])
 def Reporte_Equipo_Jugadores():
     global token
-    id_equipo = request.args.get('id')
-    return RG.Generar_Jugadores(token, id_equipo)
-@app.route("/Reporte/Partidos")
+    equipo = str(request.args.get('equipo'))
+    jugadores = request.get_json()
+    return RG.Generar_Jugadores(jugadores, equipo)
+@app.route("/Reporte/Partidos", methods=["POST"])
 def Reporte_Partidos_Marcador():
     global token
-    return RG.Generar_Historial_Partidos(token)
-@app.route("/Reporte/Partido/Roster")
+    datos = request.get_json()
+    return RG.Generar_Historial_Partidos(datos)
+@app.route("/Reporte/Partido/Roster", methods=["POST"])
 def Reporte_Jugadores_Equipo_Partido():
     global token
-    id_partido = request.args.get('id')
-    return RG.Generar_Roster_Partido(token, id_partido)
+    datos = request.get_json()
+    return RG.Generar_Roster_Partido(datos)
 @app.route("/Reporte/Estadistica/Jugador")
 def Reporte_Estadistica_Jugador():
     global token
     id_jugador = request.args.get('id')
+    data = request.get_json()
     return RG.Generar_Reporte_Estadisticas_Jugador(token, id_jugador)
 
 @app.route("/usuarios")
