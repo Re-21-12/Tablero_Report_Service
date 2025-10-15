@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   app:
@@ -6,14 +6,15 @@ services:
     container_name: reportes-app
     restart: always
     ports:
-      - "5000:5000"
+      - '5000:5000'
     environment:
       - FLASK_ENV=production
+      - FLASK_APP=app.py
       - MONGO_URI=mongodb://root:apple123@mongo:27017/
     depends_on:
       - mongo
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
 
   mongo:
     image: mongo:6
@@ -23,7 +24,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: apple123
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongo_data:/data/db
 
