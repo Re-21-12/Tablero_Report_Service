@@ -1,7 +1,7 @@
 import requests
 from flask import jsonify
 
-base = 'http://localhost:5232'
+base = 'http://backend:5000'
 
 user = {
 }
